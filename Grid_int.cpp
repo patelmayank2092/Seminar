@@ -6,7 +6,7 @@
  * @brief Definitions of Grid_int class  
  
  * @author Mayank, Sachin, Shivang, Vinayak 
- * @author Mat. No. : 22040622...
+ * @author Mat. No. : 22040622
  */
  
  
@@ -107,18 +107,24 @@ double pi=3.141592653589793238;
 double s;
 double h_=get_hValue();
 double ngp_=get_ngpValue();
-polar p;
+double phi = 0.0;
 
 for(double y=-1,i=0; y<=1; y+=h_,i++)
 {
     for(double x=-1,j=0; x<=1;x+=h_,j++)
-	{		
+    {
+        /*if (std::signbit(x)==1) { phi = (atan(y/x) + pi)*0.5; }
+        else   phi = atan(y/x) * 0.5;*/
+        if (std::signbit(x)==1 && std::signbit(y)==1) { phi = (atan(y/x))+pi; }
+        else if (std::signbit(x)==1 && std::signbit(y)==0) { phi = (atan(y/x))+pi; }
+        else if (std::signbit(x)==0 && std::signbit(y)==1) { phi = (atan(y/x)) + 2*pi; }
+        else if (std::signbit(x)==0 && std::signbit(y)==0) { phi = (atan(y/x)); }
+
         if(i==0 || i==ngp_-1) /// Traverses zero and n-1 row
 			{
-              p = polar_cor(x,y);
-              //std::cout<<(sin((p.phi*0.5*pi)/180))<<std::endl;
-              s = sqrt(p.r)*(sin((p.phi*0.5*pi)/180));
-
+              
+	    //s = pow((x*x+y*y),0.25)+sin(atan(y/x)*0.5);
+        s = sqrt(sqrt(x*x+y*y))*sin(phi*0.5);
             //std::cout<<"loop i s= "<< s << " y= " << y << " x " << x <<" r value "<<p.r<<" phi value "<<p.phi<< std::endl;
             //std::cout << "i*ngp_+j " << i*ngp_+j<<std::endl;
 			
@@ -126,11 +132,9 @@ for(double y=-1,i=0; y<=1; y+=h_,i++)
 			}
         else if(j==0 || j==ngp_-1) ///Traverses zero and n-1 column
 			{
-            p = polar_cor(x,y);
-            //std::cout<<(sin((p.phi*0.5*pi)/180))<<std::endl;
-            s = sqrt(p.r)*(sin((p.phi*0.5*pi)/180));
-			
-            //std::cout<<"loop j s= "<< s << " y= " << y << " x " << x <<" r value "<<p.r<<" phi value "<<p.phi<< std::endl;
+                    s = sqrt(sqrt(x*x+y*y))*sin(phi*0.5);
+             //s = pow((x*x+y*y),0.25)+sin(atan(y/x)*0.5);            
+		//std::cout<<"loop j s= "<< s << " y= " << y << " x " << x <<" r value "<<p.r<<" phi value "<<p.phi<< std::endl;
             //std::cout << "i*ngp_+j " << i*ngp_+j<<std::endl;
 
 			X[i*ngp_+j]=s;
@@ -144,19 +148,33 @@ for(double y=-1,i=0; y<=1; y+=h_,i++)
 //------------------------------------------------------U_exact----------------------------------------------------------------//
 
 std::vector<double> Grid_int::U_exact(){
-
 double pi=3.141592653589793238;
-double h_=get_hValue();
+double h_=get_hValue(),ex=0.0;
 double ngp_=get_ngpValue();
-double temp = h_*pi;
+int i = 0;
 std::vector<double> u_ex;
+u_ex.resize(ngp_*ngp_);
+double phi=0.0;
 
-	for(size_t i=0;i<ngp_;++i){
-	for(size_t j=0;j<ngp_;++j){
+	for(double y=-1;y<=1;y+=h_){
+	for(double x=-1;x<=1;x+=h_){
+        /*if (std::signbit(x)==1) { phi = (atan(y/x) + pi)*0.5; }
+        else  { phi = atan(y/x) * 0.5;}*/
 
-		u_ex.push_back(sin(j*temp)*sinh(i*temp));
-				}
-		}	
+        if (std::signbit(x)==1 && std::signbit(y)==1) { phi = (atan(y/x))+pi; }
+        else if (std::signbit(x)==1 && std::signbit(y)==0) { phi = (atan(y/x))+pi; }
+        else if (std::signbit(x)==0 && std::signbit(y)==1) { phi = (atan(y/x)) + 2*pi; }
+        else if (std::signbit(x)==0 && std::signbit(y)==0) { phi = (atan(y/x)); }
+
+                if (x==0 && y==0){ex = 0;}
+                else{
+
+                        ex = (sqrt(sqrt(x*x+y*y))*sin(phi*0.5));}
+                        u_ex[i] = ex;
+                        i++;
+                  
+	      }
+	}	
 
 return u_ex;
 

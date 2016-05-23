@@ -25,7 +25,7 @@ Grid::Grid(int l_level)
 level=l_level;
 double elem = pow(2,level); ///@param elem = number of elements (space between n grid points)///
 ngp= elem+1; ///@param ngp = Number of Grid points.
-h=1.0/elem; ///@param h = Grid spacing.
+h=2.0/elem; ///@param h = Grid spacing.
 
 frc.resize((ngp)*(ngp));
 u_app.resize((ngp)*(ngp),(0));

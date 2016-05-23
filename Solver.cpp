@@ -139,8 +139,8 @@ void Solver::RBGS(int l_level)
 {
 int x=level-l_level;
 double ngl_= lev_Vec[x]->Grid::get_ngpValue();
-double h2_= 1.0/((ngl_-1)*(ngl_-1));
-
+double h2_= 4.0/((ngl_-1)*(ngl_-1));
+int midval = 0.5*(ngl_-1);
 ///---------------------------------- RED UPDATE -------------------------------------------------//
 
 	 for(int i=1;i<ngl_-1;++i){
@@ -148,27 +148,31 @@ double h2_= 1.0/((ngl_-1)*(ngl_-1));
 		if(i & 1)
 		{
             for(int j=1;j<ngl_-1;j+=2){
-                if(i==ngl_*0.5 && j>=ngl_*0.5){;}
-                else{
-                lev_Vec[x]->u_app[map(i,j,ngl_)] = 0.25*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]	+
-								lev_Vec[x]->u_app[map(i,j+1,ngl_)]	+
-								lev_Vec[x]->u_app[map(i-1,j,ngl_)]	+
-								lev_Vec[x]->u_app[map(i+1,j,ngl_)]	+
-                                (h2_ * lev_Vec[x]->frc[map(i,j,ngl_)]));
-                }
-		}
-	    }
-		else{
 
-			for(int j=2;j<ngl_-1;j+=2){
-                if(i==ngl_*0.5 && j>=ngl_*0.5){;}
+                if(i==midval && j>=midval){;}
                 else{
+
                     lev_Vec[x]->u_app[map(i,j,ngl_)] = 0.25*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]	+
 								lev_Vec[x]->u_app[map(i,j+1,ngl_)]	+
 								lev_Vec[x]->u_app[map(i-1,j,ngl_)]	+
 								lev_Vec[x]->u_app[map(i+1,j,ngl_)]	+
                                 (h2_ * lev_Vec[x]->frc[map(i,j,ngl_)]));
-                 }
+         }
+        }
+	    }
+		else{
+
+			for(int j=2;j<ngl_-1;j+=2){
+
+        if(i==midval && j>=midval){;}
+                else{
+
+                    lev_Vec[x]->u_app[map(i,j,ngl_)] = 0.25*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]	+
+								lev_Vec[x]->u_app[map(i,j+1,ngl_)]	+
+								lev_Vec[x]->u_app[map(i-1,j,ngl_)]	+
+								lev_Vec[x]->u_app[map(i+1,j,ngl_)]	+
+                                (h2_ * lev_Vec[x]->frc[map(i,j,ngl_)]));
+                  }
                 }
 		}
 
@@ -180,9 +184,11 @@ double h2_= 1.0/((ngl_-1)*(ngl_-1));
 	
 		if(i & 1)
         {
-	  	for(int j=2;j<ngl_-1;j+=2)
-            {if(i==ngl_*0.5 && j>=ngl_*0.5){;}
+        for(int j=2;j<ngl_-1;j+=2){
+
+        if(i==midval && j>=midval){;}
             else{
+
 			lev_Vec[x]->u_app[map(i,j,ngl_)] = 0.25*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]	+
 								lev_Vec[x]->u_app[map(i,j+1,ngl_)]	+
 								lev_Vec[x]->u_app[map(i-1,j,ngl_)]	+
@@ -196,20 +202,22 @@ double h2_= 1.0/((ngl_-1)*(ngl_-1));
 
 			for(int j=1;j<ngl_-1;j+=2)
 			{
-             if(i==ngl_*0.5 && j>=ngl_*0.5){;}
-             else{
+
+                if(i==midval && j>=midval){;}
+                else{
+
                     lev_Vec[x]->u_app[map(i,j,ngl_)] = 0.25*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]	+
 								lev_Vec[x]->u_app[map(i,j+1,ngl_)]	+
 								lev_Vec[x]->u_app[map(i-1,j,ngl_)]	+
 								lev_Vec[x]->u_app[map(i+1,j,ngl_)]	+
 								(h2_*lev_Vec[x]->frc[map(i,j,ngl_)]));
-                    }
+                  }
                 }
 		}
 
-	 }
-}
 
+}
+}
 ///***************************** SMOOTHING FUNCTIONS *********************************************//
 
 void Solver::pre_smoothing(int l_level)
@@ -232,21 +240,26 @@ void Solver::residual(int l_level)
 
 int x=level-l_level;
 double ngl_= lev_Vec[x]->Grid::get_ngpValue();
-double h2_ = ((ngl_-1)*(ngl_-1)); // h2_ =(h^2)
+double h2_ = ((ngl_-1)*(ngl_-1))/4.0; // h2_ =(h^2)
 //std::cout<< "h sqr "<< h2_ <<std::endl ;
 //double norm=0;
 //double temp=0;
+int midval = 0.5*(ngl_-1);
+
 for(int i=1;i<ngl_-1;++i)
 	{
 	for(int j=1;j<ngl_-1;++j)
 		{
+        if(i==midval && j>=midval){;}
+        else{
+
 		//std::cout<< "i "<< i <<" j " << j << " to map " << map(i,j,ngl_) << std::endl ;
 		lev_Vec[x]->res[map(i,j,ngl_)]=	lev_Vec[x]->frc[map(i,j,ngl_)]+	(h2_*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]		+
 										lev_Vec[x]->u_app[map(i,j+1,ngl_)]			+
 										lev_Vec[x]->u_app[map(i-1,j,ngl_)]			+
 										lev_Vec[x]->u_app[map(i+1,j,ngl_)]			-
 										(4*lev_Vec[x]->u_app[map(i,j,ngl_)])));
-		
+        }
 		}
 	
 	}
@@ -287,6 +300,9 @@ for(int i=2;i<ngl_-2;i+=2)
 {
 	for(int j=2;j<ngl_-2;j+=2)
 	{
+       // if(i==ngl_*0.5 && j>=ngl_*0.5){;}
+        //else{
+
 	lev_Vec[x+1]->frc[map(i/2,j/2,ngl_1dwn)]=    	r.W*lev_Vec[x]->res[map(i,j-1,ngl_)] 		+ 
 							r.C*lev_Vec[x]->res[map(i,j,ngl_)]   		+ 
 							r.E*lev_Vec[x]->res[map(i,j+1,ngl_)]  		+ 
@@ -296,7 +312,8 @@ for(int i=2;i<ngl_-2;i+=2)
 							r.N*lev_Vec[x]->res[map(i+1,j,ngl_)] 		+ 
 							r.NW*lev_Vec[x]->res[map(i+1,j-1,ngl_)] 	+ 
 							r.NE*lev_Vec[x]->res[map(i+1,j+1,ngl_)];
-	}
+        //}
+        }
 }
 
 }
@@ -311,16 +328,19 @@ void Solver::prolongation(int l_level)
 int x=level-l_level; 
 double ngl_= lev_Vec[x]->get_ngpValue();   //coarse grid
 double ngl_up = lev_Vec[x-1]->get_ngpValue();  //fine grid
-
-
+size_t midval = 0.5*(ngl_ -1);
 Stencil_prol p;
 
 for(size_t i=1;i<ngl_-1;i++)
 	{
 	for(size_t j=1;j<ngl_-1;j++)
-		{
+        {
 
-		lev_Vec[x-1]->u_app[map(2*i-1,2*j-1,ngl_up)]	+= 	p.SW*lev_Vec[x]->u_app[map(i,j,ngl_)];
+        if(i==midval && j>=midval){;}
+
+        else{
+
+        lev_Vec[x-1]->u_app[map(2*i-1,2*j-1,ngl_up)]	+= 	p.SW*lev_Vec[x]->u_app[map(i,j,ngl_)];
 		lev_Vec[x-1]->u_app[map(2*i-1,2*j,ngl_up)]	+= 	p.S*lev_Vec[x]->u_app[map(i,j,ngl_)];
 		lev_Vec[x-1]->u_app[map(2*i-1,2*j+1,ngl_up)]  	+= 	p.SE*lev_Vec[x]->u_app[map(i,j,ngl_)];
 		lev_Vec[x-1]->u_app[map(2*i,2*j-1,ngl_up)] 	+= 	p.W*lev_Vec[x]->u_app[map(i,j,ngl_)];
@@ -329,25 +349,35 @@ for(size_t i=1;i<ngl_-1;i++)
 		lev_Vec[x-1]->u_app[map(2*i+1,2*j-1,ngl_up)] 	+=    	p.NW*lev_Vec[x]->u_app[map(i,j,ngl_)];
 		lev_Vec[x-1]->u_app[map(2*i+1,2*j,ngl_up)] 	+= 	p.N*lev_Vec[x]->u_app[map(i,j,ngl_)];
 		lev_Vec[x-1]->u_app[map(2*i+1,2*j+1,ngl_up)] 	+= 	p.NE*lev_Vec[x]->u_app[map(i,j,ngl_)];
-		}
+
+        }
+        }
 	}
 
 }
 
-void store(double ngp_,std::vector<double>u)
+void store(double ngp_,std::vector<double>u,std::vector<double>u_inti)
 {
-double hgl_ = 1.0 / (ngp_-1);
+double hgl_ = 2.0 / (ngp_-1);
 
-std::ofstream mg;
-mg.open("solution.txt");
-for(size_t i=0; i<ngp_; ++i)
+std::ofstream mg,inti;
+mg.open("solution.dat");
+
+for(double y=-1,i=0; y<=1; y+=hgl_,i++)
 {
-    {
-    for(size_t j=0; j<ngp_;++j)
-    mg<< i*hgl_<<"\t"<< j*hgl_<<"\t" <<u[i*ngp_+j] << "\n";
-    }
+    for(double x=-1,j=0; x<=1;x+=hgl_,++j)
+        mg<< x<<"\t"<< y<<"\t" <<u[i*ngp_+j] << "\n";
 }
 mg.close();
+
+//--------- store inti.dat ------------  
+
+inti.open("inti.dat");
+for(double y=-1,i=0; y<=1; y+=hgl_,i++){
+    for(double x=-1,j=0; x<=1;x+=hgl_,++j)
+          inti << x << "\t" << y <<"\t" <<u_inti[i*ngp_+j]<<"\n";	    
+	}
+inti.close();
 }
 
 //------------------------------------  Residual Norm --------------------//
@@ -385,20 +415,17 @@ return norm_res;
 
 void error(std::vector<double>u_h,std::vector<double>u_exact){
 
-std::ofstream mg;
-mg.open("task5.txt",std::fstream::in | std::fstream::out | std::fstream::app);
-
-double norm=0.;
-
+double norm=0.0;
 
 for(size_t k=0;k<u_h.size();k++){
 	
-	norm+=((u_h[k]-u_exact[k])*(u_h[k]-u_exact[k]));	
-}
-	std::cout<<"Error Norm is ......."<<norm<<std::endl;
-  	mg<<u_h.size()<<"\t"<<sqrt(norm)<<"\n";
+    //std::cout<<"k is ... "<<k<<"\t u appri.. "<<u_h[k]<<"\t u exact.. "<<u_exact[k]<<"\t differ.... "<<(u_h[k]-u_exact[k])<<std::endl;
+    //norm+=((u_h[k]-u_exact[k])*(u_h[k]-u_exact[k]));
 
-mg.close();	
+    norm +=((u_exact[k]-u_h[k]));
+
+}
+    std::cout<<"Error Norm is ......."<<norm<<std::endl;
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------//
@@ -417,12 +444,13 @@ Grid_int v(l_Level);
 
 /// Apply Boundary conditions.
 v.boundary_con();
-v.display_grid_int();
 
 std::vector<double> u_exact=v.U_exact();
 
 
 std::vector<double> u = v.get_Xvalue();
+//v.display_grid_int();
+std::vector<double> u_inti = u_exact;
 
 
 for(int i=1; i<=n_Vcycle; ++i)
@@ -498,8 +526,8 @@ std::cout<<std::endl;
 */
 
 }
-//if(l_Level>=3 && l_Level<=8){ error(u,u_exact);  }
-//store(ngp_,u);
+error(u,u_exact); 
+store(ngp_,u,u_inti);
 
 }
 
