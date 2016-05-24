@@ -143,80 +143,87 @@ double h2_= 4.0/((ngl_-1)*(ngl_-1));
 int midval = 0.5*(ngl_-1);
 ///---------------------------------- RED UPDATE -------------------------------------------------//
 
-	 for(int i=1;i<ngl_-1;++i){
-	
-		if(i & 1)
-		{
-            for(int j=1;j<ngl_-1;j+=2){
-
-                if(i==midval && j>=midval){;}
-                else{
-
-                    lev_Vec[x]->u_app[map(i,j,ngl_)] = 0.25*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]	+
+    for(int i=1;i<ngl_-1;++i)
+    {
+        if(i & 1)
+        {
+            for(int j=1;j<ngl_-1;j+=2)
+            {
+                if(i==midval && j>=midval)
+                        {
+                    lev_Vec[x]->u_app[map(i,j,ngl_)]=0.0;
+                        }
+                else
+                       {
+                       lev_Vec[x]->u_app[map(i,j,ngl_)] = 0.25*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]	+
 								lev_Vec[x]->u_app[map(i,j+1,ngl_)]	+
 								lev_Vec[x]->u_app[map(i-1,j,ngl_)]	+
 								lev_Vec[x]->u_app[map(i+1,j,ngl_)]	+
-                                (h2_ * lev_Vec[x]->frc[map(i,j,ngl_)]));
-         }
+                                                                (h2_ * lev_Vec[x]->frc[map(i,j,ngl_)]));
+                        }
+            }
         }
-	    }
-		else{
-
-			for(int j=2;j<ngl_-1;j+=2){
-
-        if(i==midval && j>=midval){;}
-                else{
-
-                    lev_Vec[x]->u_app[map(i,j,ngl_)] = 0.25*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]	+
+        else
+        {
+            for(int j=2;j<ngl_-1;j+=2)
+            {
+                if(i==midval && j>=midval)
+                    {
+                    lev_Vec[x]->u_app[map(i,j,ngl_)]=0.0;
+                    }
+                else
+                    {
+                        lev_Vec[x]->u_app[map(i,j,ngl_)] = 0.25*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]	+
 								lev_Vec[x]->u_app[map(i,j+1,ngl_)]	+
 								lev_Vec[x]->u_app[map(i-1,j,ngl_)]	+
 								lev_Vec[x]->u_app[map(i+1,j,ngl_)]	+
-                                (h2_ * lev_Vec[x]->frc[map(i,j,ngl_)]));
-                  }
-                }
-		}
+                                                                (h2_ * lev_Vec[x]->frc[map(i,j,ngl_)]));
+                    }
+            }
+        }
 
-	 }
+    }
 
 ///---------------------------------- BLACK UPDATE -----------------------------------------------//
 
-	for(int i=1;i<ngl_-1;++i){
-	
-		if(i & 1)
+    for(int i=1;i<ngl_-1;++i)
+    {
+        if(i & 1)
         {
-        for(int j=2;j<ngl_-1;j+=2){
+            for(int j=2;j<ngl_-1;j+=2)
+            {
+                if(i==midval && j>=midval)
+                { lev_Vec[x]->u_app[map(i,j,ngl_)]=0.0;}
+                else
+                {
 
-        if(i==midval && j>=midval){;}
-            else{
-
-			lev_Vec[x]->u_app[map(i,j,ngl_)] = 0.25*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]	+
-								lev_Vec[x]->u_app[map(i,j+1,ngl_)]	+
-								lev_Vec[x]->u_app[map(i-1,j,ngl_)]	+
-								lev_Vec[x]->u_app[map(i+1,j,ngl_)]	+
-								(h2_*lev_Vec[x]->frc[map(i,j,ngl_)]));
+                            lev_Vec[x]->u_app[map(i,j,ngl_)] = 0.25*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]	+
+                                                                    lev_Vec[x]->u_app[map(i,j+1,ngl_)]	+
+                                                                    lev_Vec[x]->u_app[map(i-1,j,ngl_)]	+
+                                                                    lev_Vec[x]->u_app[map(i+1,j,ngl_)]	+
+                                                                    (h2_*lev_Vec[x]->frc[map(i,j,ngl_)]));
+                }
             }
-            }
-	    	}
-		else
-		{
-
-			for(int j=1;j<ngl_-1;j+=2)
-			{
-
-                if(i==midval && j>=midval){;}
-                else{
-
+        }
+        else
+        {
+            for(int j=1;j<ngl_-1;j+=2)
+            {
+                if(i==midval && j>=midval)
+                { lev_Vec[x]->u_app[map(i,j,ngl_)]=0.0;}
+                else
+                {
                     lev_Vec[x]->u_app[map(i,j,ngl_)] = 0.25*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]	+
 								lev_Vec[x]->u_app[map(i,j+1,ngl_)]	+
 								lev_Vec[x]->u_app[map(i-1,j,ngl_)]	+
 								lev_Vec[x]->u_app[map(i+1,j,ngl_)]	+
-								(h2_*lev_Vec[x]->frc[map(i,j,ngl_)]));
-                  }
+                                                                (h2_*lev_Vec[x]->frc[map(i,j,ngl_)]));
                 }
-		}
+            }
+        }
 
 
-}
+    }
 }
 ///***************************** SMOOTHING FUNCTIONS *********************************************//
 
@@ -250,8 +257,8 @@ for(int i=1;i<ngl_-1;++i)
 	{
 	for(int j=1;j<ngl_-1;++j)
 		{
-        if(i==midval && j>=midval){;}
-        else{
+                if(i==midval && j>=midval){lev_Vec[x]->res[map(i,j,ngl_)]=0.0;}
+                else{
 
 		//std::cout<< "i "<< i <<" j " << j << " to map " << map(i,j,ngl_) << std::endl ;
 		lev_Vec[x]->res[map(i,j,ngl_)]=	lev_Vec[x]->frc[map(i,j,ngl_)]+	(h2_*(lev_Vec[x]->u_app[map(i,j-1,ngl_)]		+
@@ -259,7 +266,7 @@ for(int i=1;i<ngl_-1;++i)
 										lev_Vec[x]->u_app[map(i-1,j,ngl_)]			+
 										lev_Vec[x]->u_app[map(i+1,j,ngl_)]			-
 										(4*lev_Vec[x]->u_app[map(i,j,ngl_)])));
-        }
+                    }
 		}
 	
 	}
@@ -336,7 +343,7 @@ for(size_t i=1;i<ngl_-1;i++)
 	for(size_t j=1;j<ngl_-1;j++)
         {
 
-        if(i==midval && j>=midval){;}
+        if(i==midval && j>=midval){lev_Vec[x-1]->u_app[map(2*i,2*j,ngl_up)]=0.0;}
 
         else{
 
@@ -356,11 +363,14 @@ for(size_t i=1;i<ngl_-1;i++)
 
 }
 
-void store(double ngp_,std::vector<double>u,std::vector<double>u_inti)
+///----------------------------------Store-------------------------------------------------------///
+
+void store(double ngp_,std::vector<double>u,std::vector<double>u_inti,std::vector<double>error)
 {
 double hgl_ = 2.0 / (ngp_-1);
 
-std::ofstream mg,inti;
+std::ofstream mg,inti,err;
+
 mg.open("solution.dat");
 
 for(double y=-1,i=0; y<=1; y+=hgl_,i++)
@@ -378,6 +388,13 @@ for(double y=-1,i=0; y<=1; y+=hgl_,i++){
           inti << x << "\t" << y <<"\t" <<u_inti[i*ngp_+j]<<"\n";	    
 	}
 inti.close();
+
+err.open("error.dat");
+for(double y=-1,i=0; y<=1; y+=hgl_,i++){
+    for(double x=-1,j=0; x<=1;x+=hgl_,++j)
+          err << x << "\t" << y <<"\t" <<error[i*ngp_+j]<<"\n";
+        }
+err.close();
 }
 
 //------------------------------------  Residual Norm --------------------//
@@ -413,19 +430,23 @@ return norm_res;
 
 //--------------------------------------  Error task-5 ----------------------------------------------//
 
-void error(std::vector<double>u_h,std::vector<double>u_exact){
+void error(std::vector<double>u_h,std::vector<double>u_exact)
+{
 
 double norm=0.0;
 
-for(size_t k=0;k<u_h.size();k++){
-	
-    //std::cout<<"k is ... "<<k<<"\t u appri.. "<<u_h[k]<<"\t u exact.. "<<u_exact[k]<<"\t differ.... "<<(u_h[k]-u_exact[k])<<std::endl;
-    //norm+=((u_h[k]-u_exact[k])*(u_h[k]-u_exact[k]));
+    for(size_t k=0;k<u_h.size();k++)
+        {
 
-    norm +=((u_exact[k]-u_h[k]));
+        //std::cout<<"k is ... "<<k<<"\t u appri.. "<<u_h[k]<<"\t u exact.. "<<u_exact[k]<<"\t differ.... "<<(u_h[k]-u_exact[k])<<std::endl;
+        //norm+=((u_h[k]-u_exact[k])*(u_h[k]-u_exact[k]));
 
-}
-    std::cout<<"Error Norm is ......."<<norm<<std::endl;
+        norm +=((u_exact[k]-u_h[k])*(u_exact[k]-u_h[k]));
+
+        }
+
+std::cout<<"Error Norm is ......."<< sqrt(norm)<<std::endl;
+
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------//
@@ -450,7 +471,7 @@ std::vector<double> u_exact=v.U_exact();
 
 std::vector<double> u = v.get_Xvalue();
 //v.display_grid_int();
-std::vector<double> u_inti = u_exact;
+std::vector<double> u_inti = v.get_Xvalue();
 
 
 for(int i=1; i<=n_Vcycle; ++i)
@@ -526,8 +547,16 @@ std::cout<<std::endl;
 */
 
 }
-error(u,u_exact); 
-store(ngp_,u,u_inti);
+
+std::vector<double> err;
+
+for(size_t p=0;p<u.size();p++)
+{
+     err.push_back(u_exact[p]-u[p]);
+}
+
+error(u,u_exact);
+store(ngp_,u,u_exact/*u_inti*/,err);
 
 }
 
