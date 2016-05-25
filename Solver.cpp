@@ -392,16 +392,18 @@ for(double y=-1,i=0; y<=1; y+=hgl_,i++){
 	}
 inti.close();
 
+/*
 err.open("error.dat");
 for(double y=-1,i=0; y<=1; y+=hgl_,i++){
     for(double x=-1,j=0; x<=1;x+=hgl_,++j)
           err << x << "\t" << y <<"\t" <<error[i*ngp_+j]<<"\n";
         }
 err.close();
+*/
 }
 
 //------------------------------------  Residual Norm --------------------//
-
+/*
 double Solver::normResidual(std::vector<double> f_res,double previous_res){
 static int count=1;
 double res=0,norm_res;
@@ -430,7 +432,7 @@ for(size_t i=0;i<f_res.size();i++){
 
 return norm_res;
 }
-
+*/
 //--------------------------------------  Error task-5 ----------------------------------------------//
 
 long double error(std::vector<double>u_h,std::vector<double>u_exact)
@@ -449,8 +451,8 @@ long double norm=0.0, norm1=0.0;
 
         }
 norm = (norm/u_h.size());
-std::cout<<"u h size is ......."<< u_h.size()<<std::endl;
-std::cout<<"Error Norm is ......."<< sqrt(norm)<<std::endl;
+//std::cout<<"u h size is ......."<< u_h.size()<<std::endl;
+//std::cout<<"Error Norm is ......."<< sqrt(norm)<<std::endl;
 return (sqrt(norm));
 
 }
@@ -488,7 +490,7 @@ long double E =9.18e-5;
 
 while(er > E)
   {
-  std::cout<< "\n Current V-cycle " << i <<std::endl;
+  //std::cout<< "\n Current V-cycle " << i <<std::endl;
  
     Solver S(l_Level,u);
 
@@ -524,7 +526,7 @@ while(er > E)
  	u=S.get_u_app(l_Level);
 	
 
-	S.residual(l_Level);
+	//S.residual(l_Level);
 	
 	std::vector<double> f_res=S.get_res(l_Level);
 	
@@ -533,7 +535,7 @@ while(er > E)
 
 	er = error(u,u_exact);
 
-	std::cout<<"ER: "<<er<<std::endl;
+	//std::cout<<"ER: "<<er<<std::endl;
 	i++;
 
 /*
@@ -566,12 +568,12 @@ std::cout<<std::endl;
 
 
 std::vector<double> err;
-
+/*
 for(size_t p=0;p<u.size();p++)
 {
      err.push_back(u_exact[p]-u[p]);
 }
-
+*/
 //error(u,u_exact);
 
 store(ngp_,u,u_exact,err);
