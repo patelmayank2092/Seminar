@@ -4,19 +4,19 @@
 #include "Stencil.h"
 #include <fstream>
 
-Solver::Solver(int l_level, int n_Vcycle)
+Solver::Solver(int l_level)
 {
     level= l_level;
-    Vcycle = n_Vcycle;
+    //Vcycle = n_Vcycle;
 
     ngp_= pow(2,level)+1;
 }
 
-Solver::Solver(int l_level, int n_Vcycle, std::vector<double> &u)
+Solver::Solver(int l_level, std::vector<double> &u)
 {
 
 level= l_level;
-Vcycle = n_Vcycle;
+//Vcycle = n_Vcycle;
 
 ngp_= pow(2,level)+1; 
 u_initial = u;
@@ -343,7 +343,10 @@ for(size_t i=1;i<ngl_-1;i++)
 	for(size_t j=1;j<ngl_-1;j++)
         {
 
-        if(i==midval && j>=midval){lev_Vec[x-1]->u_app[map(2*i,2*j,ngl_up)]=0.0;}
+        if(i==midval && j>=midval)
+	{
+	lev_Vec[x-1]->u_app[map(2*i,2*j,ngl_up)]=0.0;
+	}
 
         else{
 
@@ -382,7 +385,7 @@ mg.close();
 
 //--------- store inti.dat ------------  
 
-inti.open("inti.dat");
+inti.open("init.dat");
 for(double y=-1,i=0; y<=1; y+=hgl_,i++){
     for(double x=-1,j=0; x<=1;x+=hgl_,++j)
           inti << x << "\t" << y <<"\t" <<u_inti[i*ngp_+j]<<"\n";	    
@@ -413,12 +416,12 @@ for(size_t i=0;i<f_res.size();i++){
     //div_res = res / (f_res.size() * f_res.size());
 
     norm_res = sqrt(res / (f_res.size()));
-   std::cout<<"\n Norm of residual after each V-cycle ....   "<< norm_res<<std::endl;
+   std::cout<<"\n Norm of residual after V-cycle ....   "<< norm_res<<std::endl;
 	
 	if(count>1)
 		{
 			double q = norm_res / previous_res;
-            std::cout<<" Convergence q rate after each V-cycle ....   "<< q <<std::endl;
+            std::cout<<" Convergence q rate after V-cycle ....   "<< q <<std::endl;
 		}
 
 
@@ -430,10 +433,10 @@ return norm_res;
 
 //--------------------------------------  Error task-5 ----------------------------------------------//
 
-void error(std::vector<double>u_h,std::vector<double>u_exact)
+long double error(std::vector<double>u_h,std::vector<double>u_exact)
 {
 
-double norm=0.0;
+long double norm=0.0, norm1=0.0;
 
     for(size_t k=0;k<u_h.size();k++)
         {
@@ -441,11 +444,14 @@ double norm=0.0;
         //std::cout<<"k is ... "<<k<<"\t u appri.. "<<u_h[k]<<"\t u exact.. "<<u_exact[k]<<"\t differ.... "<<(u_h[k]-u_exact[k])<<std::endl;
         //norm+=((u_h[k]-u_exact[k])*(u_h[k]-u_exact[k]));
 
-        norm +=((u_exact[k]-u_h[k])*(u_exact[k]-u_h[k]));
+        norm1 =(u_exact[k]-u_h[k]);
+	norm += norm1 * norm1;
 
         }
-
+norm = (norm/u_h.size());
+std::cout<<"u h size is ......."<< u_h.size()<<std::endl;
 std::cout<<"Error Norm is ......."<< sqrt(norm)<<std::endl;
+return (sqrt(norm));
 
 }
 
@@ -457,9 +463,9 @@ std::cout<<"Error Norm is ......."<< sqrt(norm)<<std::endl;
 void Solver::Simulation()
 {
 int l_Level = this-> level;
-int n_Vcycle = this-> Vcycle;
+//int n_Vcycle = this-> Vcycle;
 
-double r[n_Vcycle];   // store residual norm value 
+//double r[2];   // store residual norm value 
 /// Initialise grid.
 Grid_int v(l_Level);
 
@@ -473,12 +479,18 @@ std::vector<double> u = v.get_Xvalue();
 //v.display_grid_int();
 std::vector<double> u_inti = v.get_Xvalue();
 
+long double er = 1.0;
+ 
+int i=1;
 
-for(int i=1; i<=n_Vcycle; ++i)
-    {
+//for(int i=1; i<=n_Vcycle; ++i)
+long double E =9.18e-5;
+
+while(er > E)
+  {
   std::cout<< "\n Current V-cycle " << i <<std::endl;
-
-    Solver S(l_Level,i,u);
+ 
+    Solver S(l_Level,u);
 
           for (int j =l_Level; j>0; --j) // Pre Smoothning -> U Print -> Residual -> Residual print -> Restriction -> Force Print
         {
@@ -517,9 +529,12 @@ for(int i=1; i<=n_Vcycle; ++i)
 	std::vector<double> f_res=S.get_res(l_Level);
 	
 	
-	r[i]=S.normResidual(f_res,r[i-1]);
+//	r[i]=S.normResidual(f_res,r[i-1]);
 
+	er = error(u,u_exact);
 
+	std::cout<<"ER: "<<er<<std::endl;
+	i++;
 
 /*
 std::cout<<"\n U exact solution ...."<<std::endl;
@@ -532,7 +547,8 @@ for(size_t i=0; i<ngp_; ++i)
     }
 std::cout<<std::endl;
 }
-
+*/
+/*
 std::cout<<"\n U Appro. solution ...."<<std::endl;
 
 
@@ -548,6 +564,7 @@ std::cout<<std::endl;
 
 }
 
+
 std::vector<double> err;
 
 for(size_t p=0;p<u.size();p++)
@@ -555,8 +572,9 @@ for(size_t p=0;p<u.size();p++)
      err.push_back(u_exact[p]-u[p]);
 }
 
-error(u,u_exact);
-store(ngp_,u,u_exact/*u_inti*/,err);
+//error(u,u_exact);
+
+store(ngp_,u,u_exact,err);
 
 }
 

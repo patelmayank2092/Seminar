@@ -149,11 +149,12 @@ for(double y=-1,i=0; y<=1; y+=h_,i++)
 
 std::vector<double> Grid_int::U_exact(){
 double pi=3.141592653589793238;
-double h_=get_hValue(),ex=0.0;
+double h_=get_hValue();
+double ex=0.0;
 double ngp_=get_ngpValue();
 int i = 0;
 std::vector<double> u_ex;
-u_ex.resize(ngp_*ngp_);
+u_ex.resize(ngp_*ngp_,0.0);
 double phi=0.0;
 
 	for(double y=-1;y<=1;y+=h_){

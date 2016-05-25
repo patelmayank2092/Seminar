@@ -12,7 +12,7 @@ class Solver
 private:
 int level;
 double ngp_;
-int Vcycle;
+//int Vcycle;
 
 public:
 
@@ -24,11 +24,11 @@ void display_u_app(int );
 void display_frc(int );
 void display_res(int );
 
-double get_n_Vcycle();
+//double get_n_Vcycle();
 
 
-Solver(int l_level, int n_Vcycle, std::vector<double> &u);
-Solver(int l_level, int n_Vcycle);
+Solver(int l_level, std::vector<double> &u);
+Solver(int l_level);
 
 void RBGS(int l_level);
 void pre_smoothing(int l_level);
