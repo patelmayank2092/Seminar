@@ -3,6 +3,7 @@
 #include "Grid_int.h"
 #include "Stencil.h"
 #include <fstream>
+#include<omp.h>
 
 Solver::Solver(int l_level)
 {
@@ -142,12 +143,17 @@ double ngl_= lev_Vec[x]->Grid::get_ngpValue();
 double h2_= 4.0/((ngl_-1)*(ngl_-1));
 int midval = 0.5*(ngl_-1);
 ///---------------------------------- RED UPDATE -------------------------------------------------//
+int i,j;
 
-    for(int i=1;i<ngl_-1;++i)
+{
+
+
+{ 
+    for(i=1;i<ngl_-1;++i)
     {
         if(i & 1)
         {
-            for(int j=1;j<ngl_-1;j+=2)
+            for(j=1;j<ngl_-1;j+=2)
             {
                 if(i==midval && j>=midval)
                         {
@@ -165,7 +171,7 @@ int midval = 0.5*(ngl_-1);
         }
         else
         {
-            for(int j=2;j<ngl_-1;j+=2)
+            for(j=2;j<ngl_-1;j+=2)
             {
                 if(i==midval && j>=midval)
                     {
@@ -182,15 +188,17 @@ int midval = 0.5*(ngl_-1);
             }
         }
 
-    }
+	}    
+	}
 
 ///---------------------------------- BLACK UPDATE -----------------------------------------------//
 
-    for(int i=1;i<ngl_-1;++i)
+{
+    for(i=1;i<ngl_-1;++i)
     {
         if(i & 1)
         {
-            for(int j=2;j<ngl_-1;j+=2)
+            for(j=2;j<ngl_-1;j+=2)
             {
                 if(i==midval && j>=midval)
                 { lev_Vec[x]->u_app[map(i,j,ngl_)]=0.0;}
@@ -207,7 +215,7 @@ int midval = 0.5*(ngl_-1);
         }
         else
         {
-            for(int j=1;j<ngl_-1;j+=2)
+            for(j=1;j<ngl_-1;j+=2)
             {
                 if(i==midval && j>=midval)
                 { lev_Vec[x]->u_app[map(i,j,ngl_)]=0.0;}
@@ -224,6 +232,8 @@ int midval = 0.5*(ngl_-1);
 
 
     }
+}
+}
 }
 ///***************************** SMOOTHING FUNCTIONS *********************************************//
 
@@ -368,7 +378,7 @@ for(size_t i=1;i<ngl_-1;i++)
 
 ///----------------------------------Store-------------------------------------------------------///
 
-void store(double ngp_,std::vector<double>u,std::vector<double>u_inti,std::vector<double>error)
+void store(double ngp_,std::vector<double>u,std::vector<double>u_inti)//,std::vector<double>error)
 {
 double hgl_ = 2.0 / (ngp_-1);
 
@@ -434,7 +444,7 @@ return norm_res;
 }
 */
 //--------------------------------------  Error task-5 ----------------------------------------------//
-
+/*
 long double error(std::vector<double>u_h,std::vector<double>u_exact)
 {
 
@@ -456,7 +466,7 @@ norm = (norm/u_h.size());
 return (sqrt(norm));
 
 }
-
+*/
 //-----------------------------------------------------------------------------------------------------------------------------------------------//
 
 
@@ -481,14 +491,14 @@ std::vector<double> u = v.get_Xvalue();
 //v.display_grid_int();
 std::vector<double> u_inti = v.get_Xvalue();
 
-long double er = 1.0;
+//long double er = 1.0;
  
 int i=1;
 
 //for(int i=1; i<=n_Vcycle; ++i)
-long double E =9.18e-5;
+//long double E =9.18e-5;
 
-while(er > E)
+while(i < 14)
   {
   //std::cout<< "\n Current V-cycle " << i <<std::endl;
  
@@ -533,7 +543,7 @@ while(er > E)
 	
 //	r[i]=S.normResidual(f_res,r[i-1]);
 
-	er = error(u,u_exact);
+	//er = error(u,u_exact);
 
 	//std::cout<<"ER: "<<er<<std::endl;
 	i++;
@@ -566,8 +576,7 @@ std::cout<<std::endl;
 
 }
 
-
-std::vector<double> err;
+//std::vector<double> err;
 /*
 for(size_t p=0;p<u.size();p++)
 {
@@ -576,7 +585,7 @@ for(size_t p=0;p<u.size();p++)
 */
 //error(u,u_exact);
 
-store(ngp_,u,u_exact,err);
+store(ngp_,u,u_exact);//,err);
 
 }
 

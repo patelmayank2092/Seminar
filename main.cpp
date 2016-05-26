@@ -4,6 +4,7 @@
 #include"Grid.h"
 #include"Solver.h"
 #include<sys/time.h>
+#include<omp.h>
 
 int main(int argc, char *argv[])
 {
@@ -12,7 +13,7 @@ int l_Level = std::stoi(argv[1]);
 //int n_Vcycle= std::stoi(argv[2]);
 
 
-std::cout<< "l = " << l_Level << std::endl;
+//std::cout<< "l = " << l_Level << std::endl;
 
 
 struct timeval x;
