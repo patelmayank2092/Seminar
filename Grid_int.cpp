@@ -110,11 +110,12 @@ double s;
 double h_=get_hValue();
 double ngp_=get_ngpValue();
 double phi = 0.0;
+double y,x,i,j;
 
 
-for(double y=-1,i=0; y<=1; y+=h_,i++)
+for(y=-1,i=0; y<=1; y+=h_,i++)
 {
-    for(double x=-1,j=0; x<=1;x+=h_,j++)
+    for(x=-1,j=0; x<=1;x+=h_,j++)
     {
         /*if (std::signbit(x)==1) { phi = (atan(y/x) + pi)*0.5; }
         else   phi = atan(y/x) * 0.5;*/
@@ -144,8 +145,8 @@ for(double y=-1,i=0; y<=1; y+=h_,i++)
 			}
 	}
 }
-}	
-
+	
+}
 
 
 //------------------------------------------------------U_exact----------------------------------------------------------------//
@@ -161,11 +162,11 @@ int i = 0;
 std::vector<double> u_ex;
 u_ex.resize(ngp_*ngp_,0.0);
 double phi=0.0;
+double y,x;
 
 
-
-	for(double y=-1;y<=1;y+=h_){
-	for(double x=-1;x<=1;x+=h_){
+	for(y=-1;y<=1;y+=h_){
+	for(x=-1;x<=1;x+=h_){
         /*if (std::signbit(x)==1) { phi = (atan(y/x) + pi)*0.5; }
         else  { phi = atan(y/x) * 0.5;}*/
 
