@@ -20,7 +20,7 @@
 
 ///@brief Grid Constructor Definition.
 
-Grid::Grid(int l_level)
+Grid::Grid(int &l_level)
 {
 level=l_level;
 double elem = pow(2,level); ///@param elem = number of elements (space between n grid points)///

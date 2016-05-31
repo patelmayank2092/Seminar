@@ -41,7 +41,7 @@ public:
 
 ///@brief Constructor Declarations.
 ///@param l_level Grid level.
-Grid_int(int l_level);
+Grid_int(int &l_level);
 
 std::vector<double> X;
 
@@ -61,11 +61,11 @@ void boundary_con();
 std::vector<double> U_exact();
 
 };
-
+/*
 struct polar{
     double r,phi;
 };
-
+*/
 #endif
 
 

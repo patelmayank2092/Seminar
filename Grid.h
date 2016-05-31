@@ -42,7 +42,7 @@ public:
 
 ///@brief Constructor Declarations.
 ///@param = l_level Local grid level
-Grid(int l_level);
+Grid(int &l_level);
 std::vector<double> frc;
 std::vector<double> u_app;
 std::vector<double> res;

@@ -5,7 +5,8 @@
 #include <fstream>
 #include<omp.h>
 
-Solver::Solver(int l_level)
+
+Solver::Solver(int &l_level)
 {
     level= l_level;
     //Vcycle = n_Vcycle;
@@ -13,7 +14,7 @@ Solver::Solver(int l_level)
     ngp_= pow(2,level)+1;
 }
 
-Solver::Solver(int l_level, std::vector<double> &u)
+Solver::Solver(int &l_level, std::vector<double> &u)
 {
 
 level= l_level;
@@ -32,7 +33,7 @@ lev_Vec[0]->u_app = u_initial;
 
 //------------------------------getu_app----------------------------------------------------------//
 
-std::vector<double> Solver::get_u_app(int l_level)
+std::vector<double> Solver::get_u_app(int &l_level)
 {
  int x=level- l_level;
  std::vector<double> z= lev_Vec[x]->u_app;
@@ -41,7 +42,7 @@ std::vector<double> Solver::get_u_app(int l_level)
 
 //------------------------------ get_res -------------------------------------//
 
-std::vector<double> Solver::get_res(int l_level){
+std::vector<double> Solver::get_res(int &l_level){
     int x=level- l_level;
    
     std::vector<double> z= lev_Vec[x]->res;
@@ -136,23 +137,28 @@ for(size_t i=0; i<ngl_; ++i)
 ///********************************* RED-BLACK G.S. *********************************************///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Solver::RBGS(int l_level)
+void Solver::RBGS(int &l_level)
 {
 int x=level-l_level;
 double ngl_= lev_Vec[x]->Grid::get_ngpValue();
 double h2_= 4.0/((ngl_-1)*(ngl_-1));
 int midval = 0.5*(ngl_-1);
 ///---------------------------------- RED UPDATE -------------------------------------------------//
-int i,j;
+//int i,j;
 
+int k= ngl_-1;
 
+omp_set_num_threads(4);
+#pragma omp parallel
+{
+#pragma omp for
 
-{ 
-    for(i=1;i<ngl_-1;++i)
+    for(int i=1;i<k;++i)
     {
         if(i & 1)
         {
-            for(j=1;j<ngl_-1;j+=2)
+
+            for(int j=1;j<k;j+=2)
             {
                 if(i==midval && j>=midval)
                         {
@@ -170,7 +176,7 @@ int i,j;
         }
         else
         {
-            for(j=2;j<ngl_-1;j+=2)
+            for(int j=2;j<k;j+=2)
             {
                 if(i==midval && j>=midval)
                     {
@@ -188,18 +194,20 @@ int i,j;
         }
 
 	}    
-	}
+}
 
 ///---------------------------------- BLACK UPDATE -----------------------------------------------//
 
 
-
+omp_set_num_threads(4);
+#pragma omp parallel
 {
-    for(i=1;i<ngl_-1;++i)
+#pragma omp for
+    for(int i=1;i<k;++i)
     {
         if(i & 1)
         {
-            for(j=2;j<ngl_-1;j+=2)
+            for(int j=2;j<k;j+=2)
             {
                 if(i==midval && j>=midval)
                 { lev_Vec[x]->u_app[map(i,j,ngl_)]=0.0;}
@@ -216,7 +224,7 @@ int i,j;
         }
         else
         {
-            for(j=1;j<ngl_-1;j+=2)
+            for(int j=1;j<k;j+=2)
             {
                 if(i==midval && j>=midval)
                 { lev_Vec[x]->u_app[map(i,j,ngl_)]=0.0;}
@@ -235,16 +243,15 @@ int i,j;
     }
 }
 }
-
 ///***************************** SMOOTHING FUNCTIONS *********************************************//
 
-void Solver::pre_smoothing(int l_level)
+void Solver::pre_smoothing(int &l_level)
 {
     for(int i=0;i<2;++i)
         this->RBGS(l_level);
 }
 
-void Solver::post_smoothing(int l_level)
+void Solver::post_smoothing(int &l_level)
 {
 	this->RBGS(l_level);
 }
@@ -253,7 +260,7 @@ void Solver::post_smoothing(int l_level)
 ///*********************************** RESIDUAL **************************************************//
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Solver::residual(int l_level)
+void Solver::residual(int &l_level)
 {
 
 int x=level-l_level;
@@ -263,10 +270,15 @@ double h2_ = ((ngl_-1)*(ngl_-1))/4.0; // h2_ =(h^2)
 //double norm=0;
 //double temp=0;
 int midval = 0.5*(ngl_-1);
+int k =ngl_-1;
+omp_set_num_threads(4);
+#pragma omp parallel
+{
+#pragma omp for
 
-for(int i=1;i<ngl_-1;++i)
+for(int i=1;i<k;++i)
 	{
-	for(int j=1;j<ngl_-1;++j)
+    for(int j=1;j<k;++j)
 		{
                 if(i==midval && j>=midval){lev_Vec[x]->res[map(i,j,ngl_)]=0.0;}
                 else{
@@ -281,7 +293,7 @@ for(int i=1;i<ngl_-1;++i)
 		}
 	
 	}
-
+ }
 }
 
 
@@ -290,7 +302,7 @@ for(int i=1;i<ngl_-1;++i)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void Solver::restriction(int l_level)
+void Solver::restriction(int &l_level)
 {
 int x=level-l_level;
 double ngl_= lev_Vec[x]->get_ngpValue();
@@ -341,7 +353,7 @@ for(int i=2;i<ngl_-2;i+=2)
 ///*********************************** PROLONGATION **********************************************//
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Solver::prolongation(int l_level)
+void Solver::prolongation(int &l_level)
 {
 int x=level-l_level; 
 double ngl_= lev_Vec[x]->get_ngpValue();   //coarse grid
@@ -379,9 +391,9 @@ for(size_t i=1;i<ngl_-1;i++)
 
 ///----------------------------------Store-------------------------------------------------------///
 
-void store(double ngp_,std::vector<double>u,std::vector<double>u_inti)//,std::vector<double>error)
+void Solver::store(double ngp,std::vector<double>u,std::vector<double>u_inti)//,std::vector<double>error)
 {
-double hgl_ = 2.0 / (ngp_-1);
+double hgl_ = 2.0 / (ngp-1);
 
 std::ofstream mg,inti,err;
 
@@ -390,7 +402,7 @@ mg.open("solution.dat");
 for(double y=-1,i=0; y<=1; y+=hgl_,i++)
 {
     for(double x=-1,j=0; x<=1;x+=hgl_,++j)
-        mg<< x<<"\t"<< y<<"\t" <<u[i*ngp_+j] << "\n";
+        mg<< x<<"\t"<< y<<"\t" <<u[i*ngp+j] << "\n";
 }
 mg.close();
 
@@ -399,7 +411,7 @@ mg.close();
 inti.open("init.dat");
 for(double y=-1,i=0; y<=1; y+=hgl_,i++){
     for(double x=-1,j=0; x<=1;x+=hgl_,++j)
-          inti << x << "\t" << y <<"\t" <<u_inti[i*ngp_+j]<<"\n";	    
+          inti << x << "\t" << y <<"\t" <<u_inti[i*ngp+j]<<"\n";
 	}
 inti.close();
 
@@ -473,8 +485,9 @@ return (sqrt(norm));
 
 //////////////////////////////Simulation///////////////////////////////////////////////////
 
-void Solver::Simulation()
+std::vector<double> Solver::Simulation()
 {
+
 int l_Level = this-> level;
 //int n_Vcycle = this-> Vcycle;
 
@@ -516,8 +529,8 @@ while(i < 14)
         S.restriction(j);
        }
     }
-
-        S.post_smoothing(1);
+	int m=1;
+        S.post_smoothing(m);
    
   
     for (int k =1; k<l_Level; ++k) // Prolongation -> U Print +1 Level -> Residual -> Residual print -> Restriction -> Force Print
@@ -527,7 +540,8 @@ while(i < 14)
  
         if(k!=1)
         {
-            S.post_smoothing(k+1);
+	    int k1=k+1; //edit
+            S.post_smoothing(k1);
   
         }
     
@@ -586,11 +600,19 @@ for(size_t p=0;p<u.size();p++)
 */
 //error(u,u_exact);
 
-store(ngp_,u,u_exact);//,err);
 
+
+//store(ngp_,u,u_exact);//,err);
+return u;
 }
 
-
+/*
+void Solver::write()
+{
+    std::vector<double> u=S.get_u_app(l_Level);
+   std::vector<double> u_exact=v.U_exact();
+  store(ngp_,u,u_exact);//,err);
+}*/
 
 Solver::~Solver()
 {

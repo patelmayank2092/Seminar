@@ -22,7 +22,7 @@
 #include<omp.h>
 
 ///@brief Grid_int Constructor Definition.
-Grid_int::Grid_int(int l_level)
+Grid_int::Grid_int(int &l_level)
 {
 level=l_level;
 double elem = pow(2,level); 	///@param elem = number of elements (space between n grid points)///
@@ -35,7 +35,7 @@ X.resize(ngp*ngp,0);		///Stores intial approximation with BC
 
 /////////////////////////////// To access private members //////////////////////////////////////////
 
-
+/*
 polar polar_cor(double x,double y){
     polar p;
     double pi=3.141592653589793238;
@@ -50,7 +50,7 @@ polar polar_cor(double x,double y){
        return p;
 }
 
-
+*/
 
 ///@return h = Grid spacing.
 double Grid_int::get_hValue()
@@ -110,12 +110,15 @@ double s;
 double h_=get_hValue();
 double ngp_=get_ngpValue();
 double phi = 0.0;
-double y,x,i,j;
+double y,x;
+int k= ngp_-1;
+double i,j;
 
 
-for(y=-1,i=0; y<=1; y+=h_,i++)
+
+for(y=-1.0,i=0; y<=1.0; y+=h_,i++)
 {
-    for(x=-1,j=0; x<=1;x+=h_,j++)
+    for(x=-1.0,j=0; x<=1.0;x+=h_,j++)
     {
         /*if (std::signbit(x)==1) { phi = (atan(y/x) + pi)*0.5; }
         else   phi = atan(y/x) * 0.5;*/
@@ -124,7 +127,7 @@ for(y=-1,i=0; y<=1; y+=h_,i++)
         else if (std::signbit(x)==0 && std::signbit(y)==1) { phi = (atan(y/x)) + 2*pi; }
         else if (std::signbit(x)==0 && std::signbit(y)==0) { phi = (atan(y/x)); }
 
-        if(i==0 || i==ngp_-1) /// Traverses zero and n-1 row
+        if(i==0 || i==k) /// Traverses zero and n-1 row
 			{
               
 	    //s = pow((x*x+y*y),0.25)+sin(atan(y/x)*0.5);
@@ -134,7 +137,7 @@ for(y=-1,i=0; y<=1; y+=h_,i++)
 			
             X[i*ngp_+j]=s; ///i*ngp_+j = maps 2D into 1D array X.
 			}
-        else if(j==0 || j==ngp_-1) ///Traverses zero and n-1 column
+        else if(j==0 || j==k) ///Traverses zero and n-1 column
 			{
                     s = sqrt(sqrt(x*x+y*y))*sin(phi*0.5);
              //s = pow((x*x+y*y),0.25)+sin(atan(y/x)*0.5);            
@@ -165,15 +168,17 @@ double phi=0.0;
 double y,x;
 
 
-	for(y=-1;y<=1;y+=h_){
-	for(x=-1;x<=1;x+=h_){
+	for(y=-1.0;y<=1.0;y+=h_)
+	{
+		for(x=-1.0;x<=1.0;x+=h_)
+		{
         /*if (std::signbit(x)==1) { phi = (atan(y/x) + pi)*0.5; }
         else  { phi = atan(y/x) * 0.5;}*/
 
-        if (std::signbit(x)==1 && std::signbit(y)==1) { phi = (atan(y/x))+pi; }
-        else if (std::signbit(x)==1 && std::signbit(y)==0) { phi = (atan(y/x))+pi; }
-        else if (std::signbit(x)==0 && std::signbit(y)==1) { phi = (atan(y/x)) + 2*pi; }
-        else if (std::signbit(x)==0 && std::signbit(y)==0) { phi = (atan(y/x)); }
+        	if (std::signbit(x)==1 && std::signbit(y)==1) { phi = (atan(y/x))+pi; }
+        	else if (std::signbit(x)==1 && std::signbit(y)==0) { phi = (atan(y/x))+pi; }
+        	else if (std::signbit(x)==0 && std::signbit(y)==1) { phi = (atan(y/x)) + 2*pi; }
+        	else if (std::signbit(x)==0 && std::signbit(y)==0) { phi = (atan(y/x)); }
 
                 if (x==0 && y==0){ex = 0;}
                 else{
